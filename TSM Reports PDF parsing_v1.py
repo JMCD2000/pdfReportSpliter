@@ -4,8 +4,8 @@
 This program takes a known TSM reports PDF product
 and parses it out to individual pdf files
 """
-# Jonathan McDonald 7/25/2017 4:06PM
-# iteration 2.5
+# Jonathan McDonald 7/25/2017 8:07PM
+# iteration 3
 
 import PyPDF2
 import copy
@@ -67,105 +67,23 @@ checkP11 = 'Dispute/CommentsWorkflow HistoryWF NameStepTask'
 # FOR OFFICIAL USE ONLYpage1of2DIMSRecordAll
 closingHeader = 'FOR OFFICIAL USE ONLYpage'
 
-# Begin running through the pages to extract pages for printing #
-for p in range(0, pdfPages):
-    curPageObj = pdfReader.getPage(p)  # goto page number p
-    pageObj = copy.copy(curPageObj)  # reassign to preserve
-    # pageObj = pdfReader.getPage(p)  # goto page number p
-    pageStrTxt = pageObj.extractText()  # extract a text string from page
-    # Get the trial card number off of the current page with reg-ex
-    # Trial Card:ABC0000DE-FG000101
-    # literal string "Trial Card:"
-    # two to four letters (\w){2,4}
-    # four numbers (\d){4}
-    # two to four letters (\w){2,4} and optional one number (\d)?
-    # one hyphen -
-    # two letters (\w){2}
-    # six numbers (\d){6}
-    reCKp2 = re.compile(r'Trial Card:(\w){2,4}(\d){4}(\w){2,4}(\d)?-(\w){2}(\d){6}')
-    moCKp2 = reCKp2.search(pageStrTxt)  # returned page string
-    if moCKp2 is None:
-        print('Trial Card number not found on page.')
-        # move to next page, this will be the file name and is required
-        continue  # Could be a break point to exit with an error
-    else:
-        fullCKp2 = moCKp2.group()  # matched object returned
-        curCKp2 = fullCKp2[11:]  # slice out the literal string "Trial Card:"
-        Page1_TCnum = curCKp2  # this is the trial card number, used as a reference
-        outFileName = curCKp2 + '.pdf'  # this is the output file name
+errOut = open(myPDFname + 'errorLog.txt', 'w')
+errOut.close()
+compOut = open(myPDFname + 'completeLog.txt', 'w')
+compOut.close()
 
-    # checkP3
-    # Star*Priority1SafetyS
-    # four letters (\w){4} with optional "*" (\W)?
-    # eight letters (\w){8} with one number (\d)
-    # six letters (\w){6} with optional "S" (\w)?
-    reCKp3 = re.compile(r'(\w){4}(\W)?(\w){8}(\d)(\w){6}(\w)?')
-    moCKp3 = reCKp3.search(pageStrTxt)  # returned page string
-    if moCKp3 is None:
-        print('Star Priority Safety check point not found on page.')
-        # move to next page
-        checkP3 = False  # should not be needed, here as a safety catch
-        continue
-    else:
-        curCKp3 = moCKp3.group()  # matched object returned
-        checkP3 = True
+# with open('_errorLog.txt', 'a') as errorOut:
+# with open('_completeLog.txt', 'a') as compOut:
 
-    # Set to True to look for False
-    fullPage = True
-    # Look for a full page of TC Info
-    if openHeader not in pageStrTxt:
-        fullPage = False
-    if checkP1 not in pageStrTxt:
-        fullPage = False
-    if checkP2 not in pageStrTxt:
-        fullPage = False
-    if not(checkP3 is True):
-        fullPage = False
-    if checkP4 not in pageStrTxt:
-        fullPage = False
-    if checkP5 not in pageStrTxt:
-        fullPage = False
-    if checkP7 not in pageStrTxt:
-        fullPage = False
-    if checkP8 not in pageStrTxt:
-        fullPage = False
-    if checkP9 not in pageStrTxt:
-        fullPage = False
-    if checkP10 not in pageStrTxt:
-        fullPage = False
-    if checkP11 not in pageStrTxt:
-        fullPage = False
-    if closingHeader not in pageStrTxt:
-        fullPage = False
+with open(myPDFname + 'errorLog.txt', 'a') as errOut:
+    with open(myPDFname + 'completeLog.txt', 'a') as compOut:
 
-    if not (fullPage is True):
-        # print('Partial Page found, skip to next page.')
-        # move to next page
-        # TODO: overriding print first page only
-        # Page Range
-        multiPage = False
-        continue
-
-    # TODO: overriding print first page only, build a multi page export to pdf
-    # If current card continues to next page would be throwaway loop just to increment page number
-    # Page Range
-    multiPage = False  # Forced as False until TODO is completed, the set True
-    PageN_TCnum = Page1_TCnum
-    n = copy.copy(p)
-
-    # TODO: overriding print first page only
-    while multiPage is True:
-        n = n + 1
-        if n > pdfPages:
-            # Exit page range
-            n = n - 1  # one page to far
-            multiPage = False
-        else:
-            curNPageObj = pdfReader.getPage(n)  # goto next page number n
-            pageNObj = copy.copy(curNPageObj)  # reassign to preserve
-            # pageNObj = pdfReader.getPage(n)  # goto page number p
-            pageNStrTxt = pageNObj.extractText()  # extract a text string from page
-
+        # Begin running through the pages to extract pages for printing #
+        for p in range(0, pdfPages):
+            curPageObj = pdfReader.getPage(p)  # goto page number p
+            pageObj = copy.copy(curPageObj)  # reassign to preserve
+            # pageObj = pdfReader.getPage(p)  # goto page number p
+            pageStrTxt = pageObj.extractText()  # extract a text string from page
             # Get the trial card number off of the current page with reg-ex
             # Trial Card:ABC0000DE-FG000101
             # literal string "Trial Card:"
@@ -175,58 +93,134 @@ for p in range(0, pdfPages):
             # one hyphen -
             # two letters (\w){2}
             # six numbers (\d){6}
-            reNCKp2 = re.compile(r'Trial Card:(\w){2,4}(\d){4}(\w){2,4}(\d)?-(\w){2}(\d){6}')
-            moNCKp2 = reNCKp2.search(pageNStrTxt)  # returned page string
-            if moNCKp2 is None:
-                print('Trial Card number not found on following page.')
-                # Exit page range
-                multiPage = False
+            reCKp2 = re.compile(r'Trial Card:(\w){2,4}(\d){4}(\w){2,4}(\d)?-(\w){2}(\d){6}')
+            moCKp2 = reCKp2.search(pageStrTxt)  # returned page string
+            if moCKp2 is None:
+                # move to next page, this will be the file name and is required
+                errOut.write('Trial Card number not found on page.\n')
+                errOut.write(str(moCKp2) + '\s' + str(p) + '\n')
+                continue  # Could be a break point to exit with an error
             else:
-                fullNCKp2 = moNCKp2.group()  # matched object returned
-                curNCKp2 = fullNCKp2[10:]  # slice out the literal string "Trial Card:"
-                PageN_TCnum = curNCKp2  # this is Trial Card number on the next page
+                fullCKp2 = moCKp2.group()  # matched object returned
+                curCKp2 = fullCKp2[11:]  # slice out the literal string "Trial Card:"
+                Page1_TCnum = curCKp2  # this is the trial card number, used as a reference
+                outFileName = curCKp2 + '.pdf'  # this is the output file name
 
-        if not(PageN_TCnum == Page1_TCnum):
-            print('Prior page Trial Card number not found on this page.')
-            # Exit page range
-            n = n - 1  # one page to far
-            multiPage = False
-        else:
-            # Un-captured Error
-            pass
+            # checkP3
+            # Star*Priority1SafetyS
+            # four letters (\w){4} with optional "*" (\W)?
+            # eight letters (\w){8} with one number (\d)
+            # six letters (\w){6} with optional "S" (\w)?
+            reCKp3 = re.compile(r'(\w){4}(\W)?(\w){8}(\d)(\w){6}(\w)?')
+            moCKp3 = reCKp3.search(pageStrTxt)  # returned page string
+            if moCKp3 is None:
+                print('Star Priority Safety check point not found on page.')
+                # move to next page
+                checkP3 = False  # should not be needed, here as a safety catch
+                errOut.write('Star Priority Safety check point not found on page.\n')
+                errOut.write(str(curCKp2) + '\s' + str(p) + '\n')
+                continue
+            else:
+                curCKp3 = moCKp3.group()  # matched object returned
+                checkP3 = True
 
-        pageRangeUpper = n
+            # Set to True to look for False
+            fullPage = True
+            # Look for a full page of TC Info
+            if openHeader not in pageStrTxt:
+                fullPage = False
+            if checkP1 not in pageStrTxt:
+                fullPage = False
+            if checkP2 not in pageStrTxt:
+                fullPage = False
+            if not(checkP3 is True):
+                fullPage = False
+            if checkP4 not in pageStrTxt:
+                fullPage = False
+            if checkP5 not in pageStrTxt:
+                fullPage = False
+            if checkP7 not in pageStrTxt:
+                fullPage = False
+            if checkP8 not in pageStrTxt:
+                fullPage = False
+            if checkP9 not in pageStrTxt:
+                fullPage = False
+            if checkP10 not in pageStrTxt:
+                fullPage = False
+            if checkP11 not in pageStrTxt:
+                fullPage = False
+            if closingHeader not in pageStrTxt:
+                fullPage = False
 
-    # TODO: overriding print first page only, pageRangeUpper is set in above block
-    # that is out of current scope
-    pageRangeUpper = n
+            if not (fullPage is True):
+                # print('Partial Page found, skip to next page.')
+                # move to next page
+                # TODO: overriding print first page only
+                # Page Range
+                multiPage = False
+                errOut.write(str(curCKp2) + '\s' + str(p) + '\n')
+                continue
 
-    pdfWriter = PyPDF2.PdfFileWriter()  # Make pdf write too object in memory
+            # TODO: overriding print first page only, build a multi page export to pdf
+            # If current card continues to next page would be throwaway loop just to increment page number
+            # Page Range
+            multiPage = False  # Forced as False until TODO is completed, the set True
+            PageN_TCnum = Page1_TCnum
+            n = copy.copy(p)
 
-    if pageRangeUpper == p:
-        # only copy one page
-        print(outFileName)
-        pageObj = pdfReader.getPage(p)
-        pdfWriter.addPage(pageObj)
-        pdfOutputFile = open(outFileName, 'wb')  # open destination file
-        pdfWriter.write(pdfOutputFile)
-        pdfOutputFile.close
-        # Increment file counter
-        numFiles = numFiles + 1
-        # move to next page
-        continue
-
-    elif pageRangeUpper < p:
-        # out of range error, cart is before the horse
-        break
-    elif pageRangeUpper > p:
-        if pageRangeUpper > pdfPages:
-            # out of range error, last page exceeded parent doc final page
-            break
-        elif pageRangeUpper <= pdfPages:
             # TODO: overriding print first page only
-            if paperSaving is True:
+            while multiPage is True:
+                n = n + 1
+                if n > pdfPages:
+                    # Exit page range
+                    n = n - 1  # one page to far
+                    multiPage = False
+                else:
+                    curNPageObj = pdfReader.getPage(n)  # goto next page number n
+                    pageNObj = copy.copy(curNPageObj)  # reassign to preserve
+                    # pageNObj = pdfReader.getPage(n)  # goto page number p
+                    pageNStrTxt = pageNObj.extractText()  # extract a text string from page
+
+                    # Get the trial card number off of the current page with reg-ex
+                    # Trial Card:ABC0000DE-FG000101
+                    # literal string "Trial Card:"
+                    # two to four letters (\w){2,4}
+                    # four numbers (\d){4}
+                    # two to four letters (\w){2,4} and optional one number (\d)?
+                    # one hyphen -
+                    # two letters (\w){2}
+                    # six numbers (\d){6}
+                    reNCKp2 = re.compile(r'Trial Card:(\w){2,4}(\d){4}(\w){2,4}(\d)?-(\w){2}(\d){6}')
+                    moNCKp2 = reNCKp2.search(pageNStrTxt)  # returned page string
+                    if moNCKp2 is None:
+                        print('Trial Card number not found on following page.\n')
+                        # Exit page range
+                        multiPage = False
+                    else:
+                        fullNCKp2 = moNCKp2.group()  # matched object returned
+                        curNCKp2 = fullNCKp2[10:]  # slice out the literal string "Trial Card:"
+                        PageN_TCnum = curNCKp2  # this is Trial Card number on the next page
+
+                if not(PageN_TCnum == Page1_TCnum):
+                    print('Prior page Trial Card number not found on this page.\n')
+                    # Exit page range
+                    n = n - 1  # one page to far
+                    multiPage = False
+                else:
+                    # Un-captured Error
+                    pass
+
+                pageRangeUpper = n
+
+            # TODO: overriding print first page only, pageRangeUpper is set in above block
+            # that is out of current scope
+            pageRangeUpper = n
+
+            pdfWriter = PyPDF2.PdfFileWriter()  # Make pdf write too object in memory
+
+            if pageRangeUpper == p:
                 # only copy one page
+                print(outFileName)
                 pageObj = pdfReader.getPage(p)
                 pdfWriter.addPage(pageObj)
                 pdfOutputFile = open(outFileName, 'wb')  # open destination file
@@ -235,29 +229,54 @@ for p in range(0, pdfPages):
                 # Increment file counter
                 numFiles = numFiles + 1
                 # move to next page
+                compOut.write(str(curCKp2) + '\n')
                 continue
+
+            elif pageRangeUpper < p:
+                # out of range error, cart is before the horse
+                break
+            elif pageRangeUpper > p:
+                if pageRangeUpper > pdfPages:
+                    # out of range error, last page exceeded parent doc final page
+                    break
+                elif pageRangeUpper <= pdfPages:
+                    # TODO: overriding print first page only
+                    if paperSaving is True:
+                        # only copy one page
+                        pageObj = pdfReader.getPage(p)
+                        pdfWriter.addPage(pageObj)
+                        pdfOutputFile = open(outFileName, 'wb')  # open destination file
+                        pdfWriter.write(pdfOutputFile)
+                        pdfOutputFile.close
+                        # Increment file counter
+                        numFiles = numFiles + 1
+                        # move to next page
+                        compOut.write(str(curCKp2) + '\n')
+                        continue
+                    else:
+                        # copy the page range
+                        start = p
+                        end = pageRangeUpper
+                        for pageInc in range(start, end):
+                            pageObj = pdfReader.getPage(pageInc)
+                            pdfWriter.addPage(pageObj)
+
+                        pdfOutputFile = open(outFileName, 'wb')  # open destination file
+                        pdfWriter.write(pdfOutputFile)
+                        pdfOutputFile.close
+                        # Increment file counter
+                        numFiles = numFiles + 1
+                        # move to next page
+                        compOut.write(str(curCKp2) + '\n')
+                        continue
+
+                else:
+                    # Un-captured Error
+                    continue
             else:
-                # copy the page range
-                start = p
-                end = pageRangeUpper
-                for pageInc in range(start, end):
-                    pageObj = pdfReader.getPage(pageInc)
-                    pdfWriter.addPage(pageObj)
-
-                pdfOutputFile = open(outFileName, 'wb')  # open destination file
-                pdfWriter.write(pdfOutputFile)
-                pdfOutputFile.close
-                # Increment file counter
-                numFiles = numFiles + 1
-                # move to next page
+                # Un-captured Error
                 continue
 
-        else:
-            # Un-captured Error
-            continue
-    else:
-        # Un-captured Error
-        continue
 
 # Completed
 print('Finished copying pages to new pdf files')
