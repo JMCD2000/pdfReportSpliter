@@ -6,8 +6,8 @@ and parses it out to individual pdf files.
 Use the TSM Reports option.
 Don't use the TSM Export PDF option, it is not supported.
 """
-# Jonathan McDonald 7/26/2017 4:35PM
-# iteration 10
+# Jonathan McDonald 7/26/2017 4:54PM
+# iteration 11
 
 import PyPDF2
 import copy
