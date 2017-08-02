@@ -2,10 +2,10 @@
 
 """
 This program takes a known TSM reports PDF product
- and parses it out to individual pdf files
+and parses it out to individual pdf files
 """
-# Jonathan McDonald 7/25/2017 1:27PM
-# iteration 0
+# Jonathan McDonald 7/25/2017 2:41PM
+# iteration 1
 
 import PyPDF2
 import copy
@@ -18,7 +18,7 @@ numFiles = 0
 # TSM_ReportsOption this is the report to use .pdf
 myPDFname = input('Enter PDF file name:')  # file name
 # TODO: overriding print first page only
-# paperSaving = bool(input('Save paper by only printing first page of each record? (True or False): '))
+# paperSaving = boolean(input('Save paper by only printing first page of each record? (True or False): '))
 pdfFileObj = open(myPDFname, 'rb')  # file handle
 
 pdfReader = PyPDF2.PdfFileReader(pdfFileObj)  # read the pdf into workspace
@@ -68,13 +68,12 @@ checkP11 = 'Dispute/CommentsWorkflow HistoryWF NameStepTask'
 closingHeader = 'FOR OFFICIAL USE ONLYpage'
 
 # Begin running through the pages to extract pages for printing #
-for p in pdfPages:
+for p in (pdfPages):
     curPageObj = pdfReader.getPage(p)  # goto page number p
     pageObj = copy.copy(curPageObj)  # reassign to preserve
     # pageObj = pdfReader.getPage(p)  # goto page number p
     pageStrTxt = pageObj.extractText()  # extract a text string from page
-
-    # Get the trial card number off of the current page with regex
+    # Get the trial card number off of the current page with reg-ex
     # Trial Card:ABC0000DE-FG000101
     # literal string "Trial Card:"
     # two to four letters (\w){2,4}
@@ -114,7 +113,6 @@ for p in pdfPages:
 
     # Set to True to look for False
     fullPage = True
-
     # Look for a full page of TC Info
     if openHeader not in pageStrTxt:
         fullPage = False
@@ -122,7 +120,7 @@ for p in pdfPages:
         fullPage = False
     if checkP2 not in pageStrTxt:
         fullPage = False
-    if not(checkP3 == True):
+    if not(checkP3 is True):
         fullPage = False
     if checkP4 not in pageStrTxt:
         fullPage = False
@@ -141,7 +139,7 @@ for p in pdfPages:
     if closingHeader not in pageStrTxt:
         fullPage = False
 
-    if not(fullPage == True):
+    if not (fullPage is True):
         # print('Partial Page found, skip to next page.')
         # move to next page
         # TODO: overriding print first page only
@@ -157,8 +155,9 @@ for p in pdfPages:
     n = copy.copy(p)
 
     # TODO: overriding print first page only
-    while multiPage == True:
+    while multiPage is True:
         n = n + 1
+
         if n > pdfPages:
             # Exit page range
             n = n - 1  # one page to far
@@ -169,7 +168,7 @@ for p in pdfPages:
             # pageNObj = pdfReader.getPage(n)  # goto page number p
             pageNStrTxt = pageNObj.extractText()  # extract a text string from page
 
-            # Get the trial card number off of the current page with regex
+            # Get the trial card number off of the current page with reg-ex
             # Trial Card:ABC0000DE-FG000101
             # literal string "Trial Card:"
             # two to four letters (\w){2,4}
@@ -180,7 +179,7 @@ for p in pdfPages:
             # six numbers (\d){6}
             reNCKp2 = re.compile(r'Trial Card:(\w){2,4}(\d){4}(\w){2,4}(\d)?-(\w){2}(\d){6}')
             moNCKp2 = reNCKp2.search(pageNStrTxt)  # returned page string
-            if moNCKp2 == None:
+            if moNCKp2 is None:
                 print('Trial Card number not found on following page.')
                 # Exit page range
                 multiPage = False
@@ -194,6 +193,9 @@ for p in pdfPages:
             # Exit page range
             n = n - 1  # one page to far
             multiPage = False
+        else:
+            # Un-captured Error
+            pass
 
         pageRangeUpper = n
 
@@ -223,7 +225,7 @@ for p in pdfPages:
             break
         elif pageRangeUpper <= pdfPages:
             # TODO: overriding print first page only
-            if paperSaving == True:
+            if paperSaving is True:
                 # only copy one page
                 pageObj = pdfReader.getPage(p)
                 pdfWriter.addPage(pageObj)
@@ -249,15 +251,20 @@ for p in pdfPages:
                 numFiles = numFiles + 1
                 # move to next page
                 continue
+
         else:
             # Un-captured Error
             continue
-
+    else:
+        # Un-captured Error
+        continue
 
 # Completed
 print('Finished copying pages to new pdf files')
 print('Number of new files created: ' + str(numFiles))
 
+# End Of Line
 hold = input('Press any key to exit.')
 
 # End Of Line
+print('goodbye')
