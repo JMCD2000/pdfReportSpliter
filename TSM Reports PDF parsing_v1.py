@@ -9,8 +9,8 @@ Args:
 Returns:
 Raises:
 """
-# Jonathan McDonald 7/27/2017 11:55AM
-# iteration 12
+# Jonathan McDonald 8/2/2017 10:43AM
+# iteration 13
 
 import PyPDF2
 import copy
@@ -43,11 +43,12 @@ paperSaving = True
 boolNotGiven = True
 while boolNotGiven is True:
     pSaving = (input('Save paper by only printing first page of each record? ("Yes" or "No"): '))
-    if pSaving == ("yes" or "Yes"):
+    pSaving.lower()
+    if (pSaving == 'yes') or (pSaving == 'y'):
         boolNotGiven = False
         paperSaving = True
         # print('paperSaving is: ' + str(paperSaving))
-    elif pSaving == ("no" or "NO"):
+    elif (pSaving == 'no') or (pSaving == 'n'):
         boolNotGiven = False
         paperSaving = False
         # print('paperSaving is: ' + str(paperSaving))
@@ -105,13 +106,14 @@ try:
     log_A_N = False
     while log_A_N is False:
         useLoose = input('Old error log found. Append to existing or write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
-        if useLoose == 'A' or 'a':
+        useLoose.lower()
+        if useLoose == 'a':
             errOut = open(myPDFname + '_errorLog.txt', 'a')  # append to existing log file
             errOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
             errOut.write('Trial Card number' + '    ' + 'page number\n')
             errOut.close()
             log_A_N = True
-        elif useLoose == 'N' or 'n':
+        elif useLoose == 'n':
             errOut = open(myPDFname + '_errorLog.txt', 'w')  # write a new log file
             errOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
             errOut.write('Trial Card number' + '    ' + 'page number\n')
@@ -133,13 +135,14 @@ try:
     log_A_N = False
     while log_A_N is False:
         useLoose = input('Old completed log found. Append to existing or Write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
-        if useLoose == 'A' or 'a':
+        useLoose.lower()
+        if useLoose == 'a':
             compOut = open(myPDFname + '_completeLog.txt', 'a')  # append to existing log file
             compOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
             compOut.write('Trial Card number\n')
             compOut.close()
             log_A_N = True
-        elif useLoose == 'N' or 'n':
+        elif useLoose == 'n':
             compOut = open(myPDFname + '_completeLog.txt', 'w')  # write a new log file
             compOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
             compOut.write('Trial Card number\n')
@@ -209,7 +212,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
             myFile = os.path.isfile(outFileName)  # Is True if file is found, else False
             # print('os.Path.isfile: ' + str(myFile))
 
-            if myFile == False:
+            if myFile is False:
                 # Set to True to look for False
                 fullPage = True
                 # Look for a full page of TC Info
@@ -238,14 +241,14 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                 if closingHeader not in pageStrTxt:
                     fullPage = False
 
-                if fullPage == False:
+                if fullPage is False:
                     # print('Partial Page found, skip to next page.')
                     # move to next page
                     # TODO: overriding print first page only
                     # Page Range
                     multiPage = True
                     errOut.write(str(curCKp2) + '    ' + str(p) + '\n')
-                elif fullPage == True:
+                elif fullPage is True:
                     multiPage = False
                 print('full page is: ' + str(fullPage))
                 print('multi page is: ' + str(multiPage))
@@ -257,7 +260,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                 n = copy.copy(p)
 
                 # TODO: overriding print first page only
-                while multiPage == True:
+                while multiPage is True:
                     n = n + 1
                     if n > pdfPages:
                         # Exit page range, you are on the last page. Exceeded total pages
@@ -290,7 +293,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                             curNCKp2 = fullNCKp2[10:]  # slice out the literal string "Trial Card:"
                             PageN_TCnum = curNCKp2  # this is Trial Card number on the next page
 
-                    if (PageN_TCnum == Page1_TCnum) == True:
+                    if (PageN_TCnum == Page1_TCnum) is True:
                         # print('Prior page Trial Card number not found on this page.\n')
                         # Exit page range
                         n = n + 1  # go to next page
@@ -333,8 +336,8 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                         break
                     elif pageRangeUpper < pdfPages:
                         outFileIs = os.path.isfile(outFileName)
-                        if outFileIs == False:
-                            if paperSaving == True:
+                        if outFileIs is False:
+                            if paperSaving is True:
                                 # only copy one page
                                 # TODO: Check if file exist
                                 pageObj = pdfReader.getPage(p)
@@ -349,7 +352,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                                 compOut.write(str(curCKp2) + '\n')
                                 print(outFileName + ' paperSaving is True')
                                 continue
-                            elif paperSaving == False:
+                            elif paperSaving is False:
                                 # copy the page range
                                 start = p
                                 end = pageRangeUpper + 1
