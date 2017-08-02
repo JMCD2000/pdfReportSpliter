@@ -6,8 +6,8 @@ and parses it out to individual pdf files.
 Use the TSM Reports option.
 Don't use the TSM Export PDF option, it is not supported.
 """
-# Jonathan McDonald 7/26/2017 1:17PM
-# iteration 6
+# Jonathan McDonald 7/26/2017 1:41PM
+# iteration 7
 
 import PyPDF2
 import copy
@@ -39,6 +39,7 @@ while fileNotFound is True:
 multiPage = False  # Forced as False until TODO is completed, then set True
 # TODO: overriding print first page only
 # paperSaving = boolean(input('Save paper by only printing first page of each record? (True or False): '))
+paperSaving = True
 
 # Static Variables #
 # OpenningHeader
@@ -149,7 +150,6 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
             multiPage = True
             curPageObj = pdfReader.getPage(p)  # goto page number p
             pageObj = copy.copy(curPageObj)  # reassign to preserve
-            # pageObj = pdfReader.getPage(p)  # goto page number p
             pageStrTxt = pageObj.extractText()  # extract a text string from page
             # Get the trial card number off of the current page with reg-ex
             # Trial Card:ABC0000DE-FG000101
@@ -191,7 +191,9 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                 curCKp3 = moCKp3.group()  # matched object returned
                 checkP3 = True
 
-            myFile = os.path.isfile(outFileName)
+            myFile = os.path.isfile(outFileName)  # Is True if file is found, else False
+            # print('os.Path.isfile: ' + str(myFile))
+
             if myFile is False:
                 # Set to True to look for False
                 fullPage = True
@@ -227,9 +229,9 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                     # TODO: overriding print first page only
                     # Page Range
                     multiPage = True
-                    # multiPage = False
-                    # continue
                     errOut.write(str(curCKp2) + '    ' + str(p) + '\n')
+                elif fullPage is True:
+                    multiPage = False
 
                 # TODO: overriding print first page only, build a multi page export to pdf
                 # If current card continues to next page would be throwaway loop just to increment page number
@@ -237,16 +239,13 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
 
                 PageN_TCnum = Page1_TCnum
                 n = copy.copy(p)
-                print('Page start number: ' + str(p))
-                print('Multi page start number: ' + str(n))
 
                 # TODO: overriding print first page only
                 while multiPage is True:
                     n = n + 1
                     if n > pdfPages:
-                        # Exit page range
+                        # Exit page range, you are on the last page. Exceeded total pages
                         n = n - 1  # one page to far
-                        # print('out of range, next page exceeded total pages: ' + str(n))
                         multiPage = False
                     else:
                         curNPageObj = pdfReader.getPage(n)  # goto next page number n
@@ -269,24 +268,27 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                             # print('Trial Card number not found on following page.\n')
                             # Exit page range
                             multiPage = False
+                            pageRangeUpper = n - 1  # Gone to far, back up one page
                         else:
                             fullNCKp2 = moNCKp2.group()  # matched object returned
                             curNCKp2 = fullNCKp2[10:]  # slice out the literal string "Trial Card:"
                             PageN_TCnum = curNCKp2  # this is Trial Card number on the next page
 
-                    if not(PageN_TCnum == Page1_TCnum):
+                    if (PageN_TCnum == Page1_TCnum) is True:
                         # print('Prior page Trial Card number not found on this page.\n')
                         # Exit page range
-                        n = n - 1  # one page to far
-                        multiPage = False
+                        n = n + 1  # go to next page
+                        multiPage = True
                     else:
-                        # Un-captured Error
-                        pass
-
-                    pageRangeUpper = n
+                        # print('Prior page Trial Card number not found on this page.\n')
+                        # Exit page range
+                        pageRangeUpper = n - 1  # Gone to far, back up one page
+                        multiPage = False
+                    print('Page range (while multiPage is True:) number: ' + str(n))
 
                 # TODO: overriding print first page only, pageRangeUpper is set in above block
                 # that is out of current scope
+                print('Page range p number: ' + str(p))
                 pageRangeUpper = n
                 print('Page range upper number: ' + str(pageRangeUpper))
 
@@ -315,7 +317,6 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                         break
                     elif pageRangeUpper <= pdfPages:
                         if not (os.path.isfile(outFileName)):
-                            # TODO: overriding print first page only
                             if paperSaving is True:
                                 # only copy one page
                                 # TODO: Check if file exist
@@ -357,7 +358,6 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                 # Un-captured Error
                 print('file already made, pass\n')
                 continue
-
 
 # Completed
 print('Finished copying pages to new pdf files')
