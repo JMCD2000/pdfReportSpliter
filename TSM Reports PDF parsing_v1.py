@@ -5,9 +5,12 @@ This program takes a known TSM reports PDF product
 and parses it out to individual pdf files.
 Use the TSM Reports option.
 Don't use the TSM Export PDF option, it is not supported.
+Args:
+Returns:
+Raises:
 """
-# Jonathan McDonald 7/26/2017 4:54PM
-# iteration 11
+# Jonathan McDonald 7/27/2017 11:55AM
+# iteration 12
 
 import PyPDF2
 import copy
@@ -34,25 +37,25 @@ while fileNotFound is True:
     except:
         print('File not found, please re-enter the file name.\nFile must be in the Python root directory.')
 
-# Currently only prints first page
+# Select one TC page per PDF or all pages of the TC per PDF
 paperSaving = True
-print('paperSaving is: ' + str(paperSaving))
+# print('paperSaving is: ' + str(paperSaving))
 boolNotGiven = True
 while boolNotGiven is True:
     pSaving = (input('Save paper by only printing first page of each record? ("Yes" or "No"): '))
     if pSaving == ("yes" or "Yes"):
         boolNotGiven = False
         paperSaving = True
-        print('paperSaving is: ' + str(paperSaving))
+        # print('paperSaving is: ' + str(paperSaving))
     elif pSaving == ("no" or "NO"):
         boolNotGiven = False
         paperSaving = False
-        print('paperSaving is: ' + str(paperSaving))
+        # print('paperSaving is: ' + str(paperSaving))
     else:
         print('Please provide either [Yes] to save paper or [No] to print all TC history')
         boolNotGiven = True
+# print('paperSaving is: ' + str(paperSaving))
 
-print('paperSaving is: ' + str(paperSaving))
 # Static Variables #
 # OpenningHeader
 # FOR OFFICIAL USE ONLYTSM TRIAL CARD RECORD REPORT
@@ -101,7 +104,7 @@ try:
     fileFound.close()
     log_A_N = False
     while log_A_N is False:
-        useLoose = input('Old error log found. Append to existing or Write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
+        useLoose = input('Old error log found. Append to existing or write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
         if useLoose == 'A' or 'a':
             errOut = open(myPDFname + '_errorLog.txt', 'a')  # append to existing log file
             errOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
@@ -321,19 +324,6 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                     # move to next page
                     compOut.write(str(curCKp2) + '\n')
                     continue
-#                elif pageRangeUpper == (p + 1):
-#                    # only copy one page
-#                    print(outFileName + ' page range == p + 1')
-#                    pageObj = pdfReader.getPage(p)
-#                    pdfWriter.addPage(pageObj)
-#                    pdfOutputFile = open(outFileName, 'wb')  # open destination file
-#                    pdfWriter.write(pdfOutputFile)
-#                    pdfOutputFile.close
-#                    # Increment file counter
-#                    numFiles = numFiles + 1
-#                    # move to next page
-#                    compOut.write(str(curCKp2) + '\n')
-#                    continue
                 elif pageRangeUpper < p:
                     # out of range error, cart is before the horse
                     break
@@ -355,7 +345,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                                 # Increment file counter
                                 numFiles = numFiles + 1
                                 # move to next page
-                                # errOut.write(str(curCKp2) + '    ' + str(p) + ' completed\n')
+                                errOut.write(str(curCKp2) + '    ' + str(p) + ' completed\n')
                                 compOut.write(str(curCKp2) + '\n')
                                 print(outFileName + ' paperSaving is True')
                                 continue
@@ -411,4 +401,4 @@ print('Number of new files created: ' + str(numFiles))
 hold = input('Press any key to exit.')
 
 # End Of Line
-print('goodbye')
+print('Good Bye')
