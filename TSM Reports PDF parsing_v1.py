@@ -4,8 +4,8 @@
 This program takes a known TSM reports PDF product
 and parses it out to individual pdf files
 """
-# Jonathan McDonald 7/25/2017 2:41PM
-# iteration 1
+# Jonathan McDonald 7/25/2017 3:43PM
+# iteration 2
 
 import PyPDF2
 import copy
@@ -16,14 +16,15 @@ numFiles = 0
 
 # TSM_ExportOption Don't use this report .pdf
 # TSM_ReportsOption this is the report to use .pdf
-myPDFname = input('Enter PDF file name:')  # file name
+# myPDFname = input('Enter PDF file name:')  # file name
+myPDFname = 'ship report.pdf'  # file name
 # TODO: overriding print first page only
 # paperSaving = boolean(input('Save paper by only printing first page of each record? (True or False): '))
 pdfFileObj = open(myPDFname, 'rb')  # file handle
 
 pdfReader = PyPDF2.PdfFileReader(pdfFileObj)  # read the pdf into workspace
 pdfPages = pdfReader.numPages
-print('Page Count : ' + pdfPages)
+print('Page Count : ' + str(pdfPages))
 
 # Static Variables #
 # OpenningHeader
@@ -68,7 +69,7 @@ checkP11 = 'Dispute/CommentsWorkflow HistoryWF NameStepTask'
 closingHeader = 'FOR OFFICIAL USE ONLYpage'
 
 # Begin running through the pages to extract pages for printing #
-for p in (pdfPages):
+for p in range(0, pdfPages):
     curPageObj = pdfReader.getPage(p)  # goto page number p
     pageObj = copy.copy(curPageObj)  # reassign to preserve
     # pageObj = pdfReader.getPage(p)  # goto page number p
@@ -90,7 +91,7 @@ for p in (pdfPages):
         continue  # Could be a break point to exit with an error
     else:
         fullCKp2 = moCKp2.group()  # matched object returned
-        curCKp2 = fullCKp2[10:]  # slice out the literal string "Trial Card:"
+        curCKp2 = fullCKp2[11:]  # slice out the literal string "Trial Card:"
         Page1_TCnum = curCKp2  # this is the trial card number, used as a reference
         outFileName = curCKp2 + '.pdf'  # this is the output file name
 
@@ -99,8 +100,7 @@ for p in (pdfPages):
     # four letters (\w){4} with optional "*" (\W)?
     # eight letters (\w){8} with one number (\d)
     # six letters (\w){6} with optional "S" (\w)?
-    # ends with a space (\s)
-    reCKp3 = re.compile(r'(\w){4}(\W)?(\w){8}(\d)(\w){6}(\w)?(\s)')
+    reCKp3 = re.compile(r'(\w){4}(\W)?(\w){8}(\d)(\w){6}(\w)?')
     moCKp3 = reCKp3.search(pageStrTxt)  # returned page string
     if moCKp3 is None:
         print('Star Priority Safety check point not found on page.')
@@ -157,7 +157,6 @@ for p in (pdfPages):
     # TODO: overriding print first page only
     while multiPage is True:
         n = n + 1
-
         if n > pdfPages:
             # Exit page range
             n = n - 1  # one page to far
@@ -207,6 +206,7 @@ for p in (pdfPages):
 
     if pageRangeUpper == p:
         # only copy one page
+        print(outFileName)
         pageObj = pdfReader.getPage(p)
         pdfWriter.addPage(pageObj)
         pdfOutputFile = open(outFileName, 'wb')  # open destination file
@@ -216,6 +216,7 @@ for p in (pdfPages):
         numFiles = numFiles + 1
         # move to next page
         continue
+
     elif pageRangeUpper < p:
         # out of range error, cart is before the horse
         break
