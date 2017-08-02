@@ -6,8 +6,8 @@ and parses it out to individual pdf files.
 Use the TSM Reports option.
 Don't use the TSM Export PDF option, it is not supported.
 """
-# Jonathan McDonald 7/26/2017 1:41PM
-# iteration 7
+# Jonathan McDonald 7/26/2017 2:54PM
+# iteration 8
 
 import PyPDF2
 import copy
@@ -296,7 +296,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
 
                 if pageRangeUpper == p:
                     # only copy one page
-                    print(outFileName)
+                    print(outFileName + ' page range == p')
                     pageObj = pdfReader.getPage(p)
                     pdfWriter.addPage(pageObj)
                     pdfOutputFile = open(outFileName, 'wb')  # open destination file
@@ -307,7 +307,19 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                     # move to next page
                     compOut.write(str(curCKp2) + '\n')
                     continue
-
+                elif pageRangeUpper == (p + 1):
+                    # only copy one page
+                    print(outFileName + ' page range == p + 1')
+                    pageObj = pdfReader.getPage(p)
+                    pdfWriter.addPage(pageObj)
+                    pdfOutputFile = open(outFileName, 'wb')  # open destination file
+                    pdfWriter.write(pdfOutputFile)
+                    pdfOutputFile.close
+                    # Increment file counter
+                    numFiles = numFiles + 1
+                    # move to next page
+                    compOut.write(str(curCKp2) + '\n')
+                    continue
                 elif pageRangeUpper < p:
                     # out of range error, cart is before the horse
                     break
@@ -315,8 +327,9 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                     if pageRangeUpper > pdfPages:
                         # out of range error, last page exceeded parent doc final page
                         break
-                    elif pageRangeUpper <= pdfPages:
-                        if not (os.path.isfile(outFileName)):
+                    elif pageRangeUpper < pdfPages:
+                        outFileIs = os.path.isfile(outFileName)
+                        if outFileIs is False:
                             if paperSaving is True:
                                 # only copy one page
                                 # TODO: Check if file exist
@@ -328,10 +341,11 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                                 # Increment file counter
                                 numFiles = numFiles + 1
                                 # move to next page
-                                errOut.write(str(curCKp2) + '    ' + str(p) + ' completed\n')
+                                # errOut.write(str(curCKp2) + '    ' + str(p) + ' completed\n')
                                 compOut.write(str(curCKp2) + '\n')
+                                print(outFileName + ' paperSaving is True')
                                 continue
-                            else:
+                            elif paperSaving is False:
                                 # copy the page range
                                 start = p
                                 end = pageRangeUpper
@@ -345,19 +359,32 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                                 # Increment file counter
                                 numFiles = numFiles + 1
                                 # move to next page
-                                errOut.write(str(curCKp2) + '    ' + str(p) + ' completed\n')
+                                # errOut.write(str(curCKp2) + '    ' + str(p) + ' completed\n')
                                 compOut.write(str(curCKp2) + '\n')
+                                print(outFileName + ' paperSaving is False')
                                 continue
-                        else:
+                            else:
+                                # Un-captured Error
+                                continue
+                        elif outFileIs is True:
                             # File exist, don't overwrite the first file
+                            continue
+                        else:
+                            # Un-captured Error
                             continue
                     else:
                         # Un-captured Error
                         continue
-            else:
-                # Un-captured Error
+                else:
+                    # Un-captured Error
+                    continue
+            elif myFile is True:
                 print('file already made, pass\n')
                 continue
+            else:
+                # Un-captured Error
+                continue
+
 
 # Completed
 print('Finished copying pages to new pdf files')
