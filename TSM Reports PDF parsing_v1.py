@@ -9,8 +9,8 @@ Args:
 Returns:
 Raises:
 """
-# Jonathan McDonald 8/2/2017 10:43AM
-# iteration 13
+# Jonathan McDonald 8/2/2017 11:36AM
+# iteration 14
 
 import PyPDF2
 import copy
@@ -43,7 +43,7 @@ paperSaving = True
 boolNotGiven = True
 while boolNotGiven is True:
     pSaving = (input('Save paper by only printing first page of each record? ("Yes" or "No"): '))
-    pSaving.lower()
+    pSaving = pSaving.lower()
     if (pSaving == 'yes') or (pSaving == 'y'):
         boolNotGiven = False
         paperSaving = True
@@ -106,7 +106,7 @@ try:
     log_A_N = False
     while log_A_N is False:
         useLoose = input('Old error log found. Append to existing or write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
-        useLoose.lower()
+        useLoose = useLoose.lower()
         if useLoose == 'a':
             errOut = open(myPDFname + '_errorLog.txt', 'a')  # append to existing log file
             errOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
@@ -135,7 +135,7 @@ try:
     log_A_N = False
     while log_A_N is False:
         useLoose = input('Old completed log found. Append to existing or Write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
-        useLoose.lower()
+        useLoose = useLoose.lower()
         if useLoose == 'a':
             compOut = open(myPDFname + '_completeLog.txt', 'a')  # append to existing log file
             compOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
