@@ -6,8 +6,8 @@ and parses it out to individual pdf files.
 Use the TSM Reports option.
 Don't use the TSM Export PDF option, it is not supported.
 """
-# Jonathan McDonald 7/26/2017 2:54PM
-# iteration 8
+# Jonathan McDonald 7/26/2017 3:41PM
+# iteration 9
 
 import PyPDF2
 import copy
@@ -35,12 +35,24 @@ while fileNotFound is True:
         print('File not found, please re-enter the file name.\nFile must be in the Python root directory.')
 
 # Currently only prints first page
-# TODO: Bug; some reports have static variables that span two or more pages, workaround is checking the error output
-multiPage = False  # Forced as False until TODO is completed, then set True
-# TODO: overriding print first page only
-# paperSaving = boolean(input('Save paper by only printing first page of each record? (True or False): '))
 paperSaving = True
+print('paperSaving is: ' + str(paperSaving))
+boolNotGiven = True
+while boolNotGiven is True:
+    pSaving = (input('Save paper by only printing first page of each record? ("Yes" or "No"): '))
+    if pSaving == ("yes" or "Yes"):
+        boolNotGiven = False
+        paperSaving = True
+        print('paperSaving is: ' + str(paperSaving))
+    elif pSaving == ("no" or "NO"):
+        boolNotGiven = False
+        paperSaving = False
+        print('paperSaving is: ' + str(paperSaving))
+    else:
+        print('Please provide either [Yes] to save paper or [No] to print all TC history')
+        boolNotGiven = True
 
+print('paperSaving is: ' + str(paperSaving))
 # Static Variables #
 # OpenningHeader
 # FOR OFFICIAL USE ONLYTSM TRIAL CARD RECORD REPORT
@@ -278,13 +290,14 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                         # print('Prior page Trial Card number not found on this page.\n')
                         # Exit page range
                         n = n + 1  # go to next page
-                        multiPage = True
+                        multiPage = False
                     else:
                         # print('Prior page Trial Card number not found on this page.\n')
                         # Exit page range
                         pageRangeUpper = n - 1  # Gone to far, back up one page
                         multiPage = False
                     print('Page range (while multiPage is True:) number: ' + str(n))
+                    print('multi page is: ' + str(multiPage))
 
                 # TODO: overriding print first page only, pageRangeUpper is set in above block
                 # that is out of current scope
@@ -307,19 +320,19 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                     # move to next page
                     compOut.write(str(curCKp2) + '\n')
                     continue
-                elif pageRangeUpper == (p + 1):
-                    # only copy one page
-                    print(outFileName + ' page range == p + 1')
-                    pageObj = pdfReader.getPage(p)
-                    pdfWriter.addPage(pageObj)
-                    pdfOutputFile = open(outFileName, 'wb')  # open destination file
-                    pdfWriter.write(pdfOutputFile)
-                    pdfOutputFile.close
-                    # Increment file counter
-                    numFiles = numFiles + 1
-                    # move to next page
-                    compOut.write(str(curCKp2) + '\n')
-                    continue
+#                elif pageRangeUpper == (p + 1):
+#                    # only copy one page
+#                    print(outFileName + ' page range == p + 1')
+#                    pageObj = pdfReader.getPage(p)
+#                    pdfWriter.addPage(pageObj)
+#                    pdfOutputFile = open(outFileName, 'wb')  # open destination file
+#                    pdfWriter.write(pdfOutputFile)
+#                    pdfOutputFile.close
+#                    # Increment file counter
+#                    numFiles = numFiles + 1
+#                    # move to next page
+#                    compOut.write(str(curCKp2) + '\n')
+#                    continue
                 elif pageRangeUpper < p:
                     # out of range error, cart is before the horse
                     break
@@ -329,8 +342,8 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                         break
                     elif pageRangeUpper < pdfPages:
                         outFileIs = os.path.isfile(outFileName)
-                        if outFileIs is False:
-                            if paperSaving is True:
+                        if outFileIs == False:
+                            if paperSaving == True:
                                 # only copy one page
                                 # TODO: Check if file exist
                                 pageObj = pdfReader.getPage(p)
@@ -345,7 +358,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                                 compOut.write(str(curCKp2) + '\n')
                                 print(outFileName + ' paperSaving is True')
                                 continue
-                            elif paperSaving is False:
+                            elif paperSaving == False:
                                 # copy the page range
                                 start = p
                                 end = pageRangeUpper
