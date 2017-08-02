@@ -6,13 +6,14 @@ and parses it out to individual pdf files.
 Use the TSM Reports option.
 Don't use the TSM Export PDF option, it is not supported.
 """
-# Jonathan McDonald 7/26/2017 9:00AM
-# iteration 4
+# Jonathan McDonald 7/26/2017 11:19AM
+# iteration 5
 
 import PyPDF2
 import copy
 import re
 import datetime
+import os
 
 # Number of new files created
 numFiles = 0
@@ -21,15 +22,15 @@ numFiles = 0
 now = datetime.datetime.now()
 
 # Get and test the PDF file
-fileNotFound = False
-while fileNotFound is False:
+fileNotFound = True
+while fileNotFound is True:
     myPDFname = input('Enter PDF file name:')  # file name
     try:
         pdfFileObj = open(myPDFname, 'rb')  # file handle
         pdfReader = PyPDF2.PdfFileReader(pdfFileObj)  # read the pdf into workspace
         pdfPages = pdfReader.numPages
         # print('Page Count : ' + str(pdfPages))
-        fileNotFound = True
+        fileNotFound = False
     except:
         print('File not found, please re-enter the file name.\nFile must be in the Python root directory.')
 
@@ -88,13 +89,13 @@ try:
     log_A_N = False
     while log_A_N is False:
         useLoose = input('Old error log found. Append to existing or Write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
-        if useLoose == 'A':
+        if useLoose == 'A' or 'a':
             errOut = open(myPDFname + '_errorLog.txt', 'a')  # append to existing log file
             errOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
             errOut.write('Trial Card number' + '    ' + 'page number\n')
             errOut.close()
             log_A_N = True
-        elif useLoose == 'N':
+        elif useLoose == 'N' or 'n':
             errOut = open(myPDFname + '_errorLog.txt', 'w')  # write a new log file
             errOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
             errOut.write('Trial Card number' + '    ' + 'page number\n')
@@ -116,13 +117,13 @@ try:
     log_A_N = False
     while log_A_N is False:
         useLoose = input('Old completed log found. Append to existing or Write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
-        if useLoose == 'A':
+        if useLoose == 'A' or 'a':
             compOut = open(myPDFname + '_completeLog.txt', 'a')  # append to existing log file
             compOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
             compOut.write('Trial Card number\n')
             compOut.close()
             log_A_N = True
-        elif useLoose == 'N':
+        elif useLoose == 'N' or 'n':
             compOut = open(myPDFname + '_completeLog.txt', 'w')  # write a new log file
             compOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
             compOut.write('Trial Card number\n')
@@ -145,6 +146,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
 
         # Begin running through the pages to extract pages for printing #
         for p in range(0, pdfPages):
+            multiPage = False
             curPageObj = pdfReader.getPage(p)  # goto page number p
             pageObj = copy.copy(curPageObj)  # reassign to preserve
             # pageObj = pdfReader.getPage(p)  # goto page number p
@@ -217,14 +219,15 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
             if closingHeader not in pageStrTxt:
                 fullPage = False
 
-            if not (fullPage is True):
+            if fullPage is False:
                 # print('Partial Page found, skip to next page.')
                 # move to next page
                 # TODO: overriding print first page only
                 # Page Range
-                multiPage = False
+                multiPage = True
+                # multiPage = False
+                # continue
                 errOut.write(str(curCKp2) + '    ' + str(p) + '\n')
-                continue
 
             # TODO: overriding print first page only, build a multi page export to pdf
             # If current card continues to next page would be throwaway loop just to increment page number
@@ -232,6 +235,8 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
 
             PageN_TCnum = Page1_TCnum
             n = copy.copy(p)
+            print('Page start number: ' + str(p))
+            print('Multi page start number: ' + str(n))
 
             # TODO: overriding print first page only
             while multiPage is True:
@@ -239,6 +244,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                 if n > pdfPages:
                     # Exit page range
                     n = n - 1  # one page to far
+                    print('out of range, next page exceeded total pages: ' + str(n))
                     multiPage = False
                 else:
                     curNPageObj = pdfReader.getPage(n)  # goto next page number n
@@ -280,6 +286,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
             # TODO: overriding print first page only, pageRangeUpper is set in above block
             # that is out of current scope
             pageRangeUpper = n
+            print('Page range upper number: ' + str(pageRangeUpper))
 
             pdfWriter = PyPDF2.PdfFileWriter()  # Make pdf write too object in memory
 
@@ -305,36 +312,42 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                     # out of range error, last page exceeded parent doc final page
                     break
                 elif pageRangeUpper <= pdfPages:
-                    # TODO: overriding print first page only
-                    if paperSaving is True:
-                        # only copy one page
-                        pageObj = pdfReader.getPage(p)
-                        pdfWriter.addPage(pageObj)
-                        pdfOutputFile = open(outFileName, 'wb')  # open destination file
-                        pdfWriter.write(pdfOutputFile)
-                        pdfOutputFile.close
-                        # Increment file counter
-                        numFiles = numFiles + 1
-                        # move to next page
-                        compOut.write(str(curCKp2) + '\n')
-                        continue
-                    else:
-                        # copy the page range
-                        start = p
-                        end = pageRangeUpper
-                        for pageInc in range(start, end):
-                            pageObj = pdfReader.getPage(pageInc)
+                    if not (os.path.isfile(outFileName)):
+                        # TODO: overriding print first page only
+                        if paperSaving is True:
+                            # only copy one page
+                            # TODO: Check if file exist
+                            pageObj = pdfReader.getPage(p)
                             pdfWriter.addPage(pageObj)
+                            pdfOutputFile = open(outFileName, 'wb')  # open destination file
+                            pdfWriter.write(pdfOutputFile)
+                            pdfOutputFile.close
+                            # Increment file counter
+                            numFiles = numFiles + 1
+                            # move to next page
+                            errOut.write(str(curCKp2) + '    ' + str(p) + ' completed\n')
+                            compOut.write(str(curCKp2) + '\n')
+                            continue
+                        else:
+                            # copy the page range
+                            start = p
+                            end = pageRangeUpper
+                            for pageInc in range(start, end):
+                                pageObj = pdfReader.getPage(pageInc)
+                                pdfWriter.addPage(pageObj)
 
-                        pdfOutputFile = open(outFileName, 'wb')  # open destination file
-                        pdfWriter.write(pdfOutputFile)
-                        pdfOutputFile.close
-                        # Increment file counter
-                        numFiles = numFiles + 1
-                        # move to next page
-                        compOut.write(str(curCKp2) + '\n')
+                            pdfOutputFile = open(outFileName, 'wb')  # open destination file
+                            pdfWriter.write(pdfOutputFile)
+                            pdfOutputFile.close
+                            # Increment file counter
+                            numFiles = numFiles + 1
+                            # move to next page
+                            errOut.write(str(curCKp2) + '    ' + str(p) + ' completed\n')
+                            compOut.write(str(curCKp2) + '\n')
+                            continue
+                    else:
+                        # File exist, don't overwrite the first file
                         continue
-
                 else:
                     # Un-captured Error
                     continue
