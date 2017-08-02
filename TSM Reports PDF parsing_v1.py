@@ -4,8 +4,8 @@
 This program takes a known TSM reports PDF product
 and parses it out to individual pdf files
 """
-# Jonathan McDonald 7/25/2017 3:43PM
-# iteration 2
+# Jonathan McDonald 7/25/2017 4:06PM
+# iteration 2.5
 
 import PyPDF2
 import copy
@@ -16,8 +16,7 @@ numFiles = 0
 
 # TSM_ExportOption Don't use this report .pdf
 # TSM_ReportsOption this is the report to use .pdf
-# myPDFname = input('Enter PDF file name:')  # file name
-myPDFname = 'ship report.pdf'  # file name
+myPDFname = input('Enter PDF file name:')  # file name
 # TODO: overriding print first page only
 # paperSaving = boolean(input('Save paper by only printing first page of each record? (True or False): '))
 pdfFileObj = open(myPDFname, 'rb')  # file handle
