@@ -6,8 +6,8 @@ and parses it out to individual pdf files.
 Use the TSM Reports option.
 Don't use the TSM Export PDF option, it is not supported.
 """
-# Jonathan McDonald 7/26/2017 3:41PM
-# iteration 9
+# Jonathan McDonald 7/26/2017 4:35PM
+# iteration 10
 
 import PyPDF2
 import copy
@@ -206,7 +206,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
             myFile = os.path.isfile(outFileName)  # Is True if file is found, else False
             # print('os.Path.isfile: ' + str(myFile))
 
-            if myFile is False:
+            if myFile == False:
                 # Set to True to look for False
                 fullPage = True
                 # Look for a full page of TC Info
@@ -235,16 +235,17 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                 if closingHeader not in pageStrTxt:
                     fullPage = False
 
-                if fullPage is False:
+                if fullPage == False:
                     # print('Partial Page found, skip to next page.')
                     # move to next page
                     # TODO: overriding print first page only
                     # Page Range
                     multiPage = True
                     errOut.write(str(curCKp2) + '    ' + str(p) + '\n')
-                elif fullPage is True:
+                elif fullPage == True:
                     multiPage = False
-
+                print('full page is: ' + str(fullPage))
+                print('multi page is: ' + str(multiPage))
                 # TODO: overriding print first page only, build a multi page export to pdf
                 # If current card continues to next page would be throwaway loop just to increment page number
                 # Page Range
@@ -253,7 +254,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                 n = copy.copy(p)
 
                 # TODO: overriding print first page only
-                while multiPage is True:
+                while multiPage == True:
                     n = n + 1
                     if n > pdfPages:
                         # Exit page range, you are on the last page. Exceeded total pages
@@ -286,7 +287,7 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                             curNCKp2 = fullNCKp2[10:]  # slice out the literal string "Trial Card:"
                             PageN_TCnum = curNCKp2  # this is Trial Card number on the next page
 
-                    if (PageN_TCnum == Page1_TCnum) is True:
+                    if (PageN_TCnum == Page1_TCnum) == True:
                         # print('Prior page Trial Card number not found on this page.\n')
                         # Exit page range
                         n = n + 1  # go to next page
@@ -361,8 +362,11 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                             elif paperSaving == False:
                                 # copy the page range
                                 start = p
-                                end = pageRangeUpper
+                                end = pageRangeUpper + 1
                                 for pageInc in range(start, end):
+                                    print('pageInc is: ' + str(pageInc))
+                                    print('start is: ' + str(start))
+                                    print('end is: ' + str(end))
                                     pageObj = pdfReader.getPage(pageInc)
                                     pdfWriter.addPage(pageObj)
 
