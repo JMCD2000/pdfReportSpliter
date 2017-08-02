@@ -2,28 +2,42 @@
 
 """
 This program takes a known TSM reports PDF product
-and parses it out to individual pdf files
+and parses it out to individual pdf files.
+Use the TSM Reports option.
+Don't use the TSM Export PDF option, it is not supported.
 """
-# Jonathan McDonald 7/25/2017 8:07PM
-# iteration 3
+# Jonathan McDonald 7/26/2017 9:00AM
+# iteration 4
 
 import PyPDF2
 import copy
 import re
+import datetime
 
 # Number of new files created
 numFiles = 0
 
-# TSM_ExportOption Don't use this report .pdf
-# TSM_ReportsOption this is the report to use .pdf
-myPDFname = input('Enter PDF file name:')  # file name
+# Date time stamp
+now = datetime.datetime.now()
+
+# Get and test the PDF file
+fileNotFound = False
+while fileNotFound is False:
+    myPDFname = input('Enter PDF file name:')  # file name
+    try:
+        pdfFileObj = open(myPDFname, 'rb')  # file handle
+        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)  # read the pdf into workspace
+        pdfPages = pdfReader.numPages
+        # print('Page Count : ' + str(pdfPages))
+        fileNotFound = True
+    except:
+        print('File not found, please re-enter the file name.\nFile must be in the Python root directory.')
+
+# Currently only prints first page
+# TODO: Bug; some reports have static variables that span two or more pages, workaround is checking the error output
+multiPage = False  # Forced as False until TODO is completed, then set True
 # TODO: overriding print first page only
 # paperSaving = boolean(input('Save paper by only printing first page of each record? (True or False): '))
-pdfFileObj = open(myPDFname, 'rb')  # file handle
-
-pdfReader = PyPDF2.PdfFileReader(pdfFileObj)  # read the pdf into workspace
-pdfPages = pdfReader.numPages
-print('Page Count : ' + str(pdfPages))
 
 # Static Variables #
 # OpenningHeader
@@ -67,16 +81,67 @@ checkP11 = 'Dispute/CommentsWorkflow HistoryWF NameStepTask'
 # FOR OFFICIAL USE ONLYpage1of2DIMSRecordAll
 closingHeader = 'FOR OFFICIAL USE ONLYpage'
 
-errOut = open(myPDFname + 'errorLog.txt', 'w')
-errOut.close()
-compOut = open(myPDFname + 'completeLog.txt', 'w')
-compOut.close()
+# Open the Error Log
+try:
+    fileFound = open(myPDFname + '_errorLog.txt', 'r')  # read to see if file exist
+    fileFound.close()
+    log_A_N = False
+    while log_A_N is False:
+        useLoose = input('Old error log found. Append to existing or Write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
+        if useLoose == 'A':
+            errOut = open(myPDFname + '_errorLog.txt', 'a')  # append to existing log file
+            errOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
+            errOut.write('Trial Card number' + '    ' + 'page number\n')
+            errOut.close()
+            log_A_N = True
+        elif useLoose == 'N':
+            errOut = open(myPDFname + '_errorLog.txt', 'w')  # write a new log file
+            errOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
+            errOut.write('Trial Card number' + '    ' + 'page number\n')
+            errOut.close()
+            log_A_N = True
+        else:
+            print('Invalid log command. Enter either an [A] or a [N]')
+except:
+    errOut = open(myPDFname + '_errorLog.txt', 'w')  # write a new log file
+    errOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
+    errOut.write('Trial Card number' + '    ' + 'page number\n')
+    errOut.close()
+    print('New error log created')
+
+# Open the Completed Log
+try:
+    fileFound = open(myPDFname + '_completeLog.txt', 'r')  # read to see if file exist
+    fileFound.close()
+    log_A_N = False
+    while log_A_N is False:
+        useLoose = input('Old completed log found. Append to existing or Write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
+        if useLoose == 'A':
+            compOut = open(myPDFname + '_completeLog.txt', 'a')  # append to existing log file
+            compOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
+            compOut.write('Trial Card number\n')
+            compOut.close()
+            log_A_N = True
+        elif useLoose == 'N':
+            compOut = open(myPDFname + '_completeLog.txt', 'w')  # write a new log file
+            compOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
+            compOut.write('Trial Card number\n')
+            compOut.close()
+            log_A_N = True
+        else:
+            print('Invalid log command. Enter either an [A] or a [N]')
+except:
+    compOut = open(myPDFname + '_completeLog.txt', 'w')  # write a new log file
+    compOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
+    compOut.write('Trial Card number\n')
+    compOut.close()
+    print('New completion log created')
 
 # with open('_errorLog.txt', 'a') as errorOut:
 # with open('_completeLog.txt', 'a') as compOut:
 
-with open(myPDFname + 'errorLog.txt', 'a') as errOut:
-    with open(myPDFname + 'completeLog.txt', 'a') as compOut:
+with open(myPDFname + '_errorLog.txt', 'a') as errOut:
+    with open(myPDFname + '_completeLog.txt', 'a') as compOut:
 
         # Begin running through the pages to extract pages for printing #
         for p in range(0, pdfPages):
@@ -98,7 +163,7 @@ with open(myPDFname + 'errorLog.txt', 'a') as errOut:
             if moCKp2 is None:
                 # move to next page, this will be the file name and is required
                 errOut.write('Trial Card number not found on page.\n')
-                errOut.write(str(moCKp2) + '\s' + str(p) + '\n')
+                errOut.write(str(moCKp2) + '    ' + str(p) + '\n')
                 continue  # Could be a break point to exit with an error
             else:
                 fullCKp2 = moCKp2.group()  # matched object returned
@@ -118,7 +183,7 @@ with open(myPDFname + 'errorLog.txt', 'a') as errOut:
                 # move to next page
                 checkP3 = False  # should not be needed, here as a safety catch
                 errOut.write('Star Priority Safety check point not found on page.\n')
-                errOut.write(str(curCKp2) + '\s' + str(p) + '\n')
+                errOut.write(str(curCKp2) + '    ' + str(p) + '\n')
                 continue
             else:
                 curCKp3 = moCKp3.group()  # matched object returned
@@ -158,13 +223,13 @@ with open(myPDFname + 'errorLog.txt', 'a') as errOut:
                 # TODO: overriding print first page only
                 # Page Range
                 multiPage = False
-                errOut.write(str(curCKp2) + '\s' + str(p) + '\n')
+                errOut.write(str(curCKp2) + '    ' + str(p) + '\n')
                 continue
 
             # TODO: overriding print first page only, build a multi page export to pdf
             # If current card continues to next page would be throwaway loop just to increment page number
             # Page Range
-            multiPage = False  # Forced as False until TODO is completed, the set True
+
             PageN_TCnum = Page1_TCnum
             n = copy.copy(p)
 
