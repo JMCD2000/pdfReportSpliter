@@ -99,6 +99,10 @@ checkP11 = 'Dispute/CommentsWorkflow HistoryWF NameStepTask'
 # FOR OFFICIAL USE ONLYpage1of2DIMSRecordAll
 closingHeader = 'FOR OFFICIAL USE ONLYpage'
 
+# Static Variables List #
+# checkP3 left out because checking for True or False
+staticReportsSectionsList = [openHeader, checkP1, checkP2, checkP4, checkP5, checkP6, checkP7, checkP8, checkP9, checkP10, checkP11, closingHeader]
+
 # Open the Error Log
 try:
     fileFound = open(myPDFname + '_errorLog.txt', 'r')  # read to see if file exist
@@ -215,31 +219,40 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
             if myFile is False:
                 # Set to True to look for False
                 fullPage = True
+
                 # Look for a full page of TC Info
-                if openHeader not in pageStrTxt:
-                    fullPage = False
-                if checkP1 not in pageStrTxt:
-                    fullPage = False
-                if checkP2 not in pageStrTxt:
-                    fullPage = False
-                if not(checkP3 is True):
-                    fullPage = False
-                if checkP4 not in pageStrTxt:
-                    fullPage = False
-                if checkP5 not in pageStrTxt:
-                    fullPage = False
-                if checkP7 not in pageStrTxt:
-                    fullPage = False
-                if checkP8 not in pageStrTxt:
-                    fullPage = False
-                if checkP9 not in pageStrTxt:
-                    fullPage = False
-                if checkP10 not in pageStrTxt:
-                    fullPage = False
-                if checkP11 not in pageStrTxt:
-                    fullPage = False
-                if closingHeader not in pageStrTxt:
-                    fullPage = False
+                for section in staticReportsSectionsList:
+                    if section == checkP3:
+                        if not(section is True):
+                            fullPage = False
+                    elif section not in pageStrTxt:
+                        fullPage = False
+                        
+##                # Look for a full page of TC Info
+##                if openHeader not in pageStrTxt:
+##                    fullPage = False
+##                if checkP1 not in pageStrTxt:
+##                    fullPage = False
+##                if checkP2 not in pageStrTxt:
+##                    fullPage = False
+##                if not(checkP3 is True):
+##                    fullPage = False
+##                if checkP4 not in pageStrTxt:
+##                    fullPage = False
+##                if checkP5 not in pageStrTxt:
+##                    fullPage = False
+##                if checkP7 not in pageStrTxt:
+##                    fullPage = False
+##                if checkP8 not in pageStrTxt:
+##                    fullPage = False
+##                if checkP9 not in pageStrTxt:
+##                    fullPage = False
+##                if checkP10 not in pageStrTxt:
+##                    fullPage = False
+##                if checkP11 not in pageStrTxt:
+##                    fullPage = False
+##                if closingHeader not in pageStrTxt:
+##                    fullPage = False
 
                 if fullPage is False:
                     # print('Partial Page found, skip to next page.')
