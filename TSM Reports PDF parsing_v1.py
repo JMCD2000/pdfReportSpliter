@@ -9,7 +9,7 @@ Args:
 Returns:
 Raises:
 """
-# Jonathan McDonald 8/2/2017 11:36AM
+# Jonathan McDonald 8/4/2017 3:43PM
 # iteration 14
 
 import PyPDF2
@@ -69,7 +69,6 @@ checkP1 = 'Generated on:'
 checkP2 = 'Trial Card:'
 # checkP4
 # DiscoveredScreeningStatus DateStatusAction TakenAuthority
-# reference values
 checkP4 = 'DiscoveredScreeningStatus DateStatusAction TakenAuthority'
 # checkP5
 # Equipment:Some piece of gear
@@ -79,11 +78,9 @@ checkP5 = 'Equipment:'
 checkP6 = 'Rationale:'
 # checkP7
 # Transferred fromTransferred toCompartmentOriginatorPOCClosing Authority
-# reference values
 checkP7 = 'Transferred fromTransferred toCompartmentOriginatorPOCClosing Authority'
 # checkP8
 # ReferencesSWBSKey EventAssoc. Doc.Offsite 3
-# reference values
 checkP8 = 'ReferencesSWBSKey EventAssoc. Doc.Offsite 3'
 # checkP9
 # Amplifier
@@ -93,7 +90,6 @@ checkP9 = 'Amplifier'
 checkP10 = 'Narrative:'
 # checkP11
 # Dispute/CommentsWorkflow HistoryWF NameStepTask \#Assigned ToCompleted byStartedDueCompleted
-# reference values
 checkP11 = 'Dispute/CommentsWorkflow HistoryWF NameStepTask'
 # ClosingHeader
 # FOR OFFICIAL USE ONLYpage1of2DIMSRecordAll
@@ -161,9 +157,6 @@ except:
     compOut.close()
     print('New completion log created')
 
-# with open('_errorLog.txt', 'a') as errorOut:
-# with open('_completeLog.txt', 'a') as compOut:
-
 with open(myPDFname + '_errorLog.txt', 'a') as errOut:
     with open(myPDFname + '_completeLog.txt', 'a') as compOut:
 
@@ -222,42 +215,15 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
 
                 # Look for a full page of TC Info
                 for section in staticReportsSectionsList:
-                    if section == checkP3:
-                        if not(section is True):
-                            fullPage = False
-                    elif section not in pageStrTxt:
+                    if  section not in pageStrTxt:
                         fullPage = False
-                        
-##                # Look for a full page of TC Info
-##                if openHeader not in pageStrTxt:
-##                    fullPage = False
-##                if checkP1 not in pageStrTxt:
-##                    fullPage = False
-##                if checkP2 not in pageStrTxt:
-##                    fullPage = False
-##                if not(checkP3 is True):
-##                    fullPage = False
-##                if checkP4 not in pageStrTxt:
-##                    fullPage = False
-##                if checkP5 not in pageStrTxt:
-##                    fullPage = False
-##                if checkP7 not in pageStrTxt:
-##                    fullPage = False
-##                if checkP8 not in pageStrTxt:
-##                    fullPage = False
-##                if checkP9 not in pageStrTxt:
-##                    fullPage = False
-##                if checkP10 not in pageStrTxt:
-##                    fullPage = False
-##                if checkP11 not in pageStrTxt:
-##                    fullPage = False
-##                if closingHeader not in pageStrTxt:
-##                    fullPage = False
 
+                if not(checkP3 is True):
+                    fullPage = False
+                        
                 if fullPage is False:
                     # print('Partial Page found, skip to next page.')
                     # move to next page
-                    # TODO: overriding print first page only
                     # Page Range
                     multiPage = True
                     errOut.write(str(curCKp2) + '    ' + str(p) + '\n')
@@ -265,14 +231,12 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                     multiPage = False
                 print('full page is: ' + str(fullPage))
                 print('multi page is: ' + str(multiPage))
-                # TODO: overriding print first page only, build a multi page export to pdf
                 # If current card continues to next page would be throwaway loop just to increment page number
                 # Page Range
 
                 PageN_TCnum = Page1_TCnum
                 n = copy.copy(p)
 
-                # TODO: overriding print first page only
                 while multiPage is True:
                     n = n + 1
                     if n > pdfPages:
@@ -319,8 +283,6 @@ with open(myPDFname + '_errorLog.txt', 'a') as errOut:
                     print('Page range (while multiPage is True:) number: ' + str(n))
                     print('multi page is: ' + str(multiPage))
 
-                # TODO: overriding print first page only, pageRangeUpper is set in above block
-                # that is out of current scope
                 print('Page range p number: ' + str(p))
                 pageRangeUpper = n
                 print('Page range upper number: ' + str(pageRangeUpper))
