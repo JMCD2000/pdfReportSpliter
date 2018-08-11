@@ -9,8 +9,8 @@ Args:
 Returns:
 Raises:
 """
-# Jonathan McDonald 8/4/2017 3:43PM
-# iteration 14
+# Jonathan McDonald 8/10/2018 8:03AM
+# iteration 15
 
 import PyPDF2
 import copy
@@ -101,20 +101,23 @@ staticReportsSectionsList = [openHeader, checkP1, checkP2, checkP4, checkP5, che
 
 # Open the Error Log
 try:
-    fileFound = open(myPDFname + '_errorLog.txt', 'r')  # read to see if file exist
+    # Changing from a dynamic log(s) file naming to a static log file name
+	# in order to incorporate into a gitignore file
+    # fileFound = open(myPDFname + '_errorLog.txt', 'r')  # read to see if file exist
+    fileFound = open('pdfReportSpliter_errorLog.txt', 'r')  # read to see if file exist
     fileFound.close()
     log_A_N = False
     while log_A_N is False:
         useLoose = input('Old error log found. Append to existing or write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
         useLoose = useLoose.lower()
         if useLoose == 'a':
-            errOut = open(myPDFname + '_errorLog.txt', 'a')  # append to existing log file
+            errOut = open('pdfReportSpliter_errorLog.txt', 'a')  # append to existing log file
             errOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
             errOut.write('Trial Card number' + '    ' + 'page number\n')
             errOut.close()
             log_A_N = True
         elif useLoose == 'n':
-            errOut = open(myPDFname + '_errorLog.txt', 'w')  # write a new log file
+            errOut = open('pdfReportSpliter_errorLog.txt', 'w')  # write a new log file
             errOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
             errOut.write('Trial Card number' + '    ' + 'page number\n')
             errOut.close()
@@ -122,7 +125,7 @@ try:
         else:
             print('Invalid log command. Enter either an [A] or a [N]')
 except:
-    errOut = open(myPDFname + '_errorLog.txt', 'w')  # write a new log file
+    errOut = open('pdfReportSpliter_errorLog.txt', 'w')  # write a new log file
     errOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
     errOut.write('Trial Card number' + '    ' + 'page number\n')
     errOut.close()
@@ -130,20 +133,23 @@ except:
 
 # Open the Completed Log
 try:
-    fileFound = open(myPDFname + '_completeLog.txt', 'r')  # read to see if file exist
+    # Changing from a dynamic log(s) file naming to a static log file name
+	# in order to incorporate into a gitignore file
+    # fileFound = open(myPDFname + '_completeLog.txt', 'r')  # read to see if file exist
+	fileFound = open('pdfReportSpliter_completeLog.txt', 'r')  # read to see if file exist
     fileFound.close()
     log_A_N = False
     while log_A_N is False:
         useLoose = input('Old completed log found. Append to existing or Write New?\n(Enter "A" or "N"): ')  # Ask to use old or write new
         useLoose = useLoose.lower()
         if useLoose == 'a':
-            compOut = open(myPDFname + '_completeLog.txt', 'a')  # append to existing log file
+            compOut = open('pdfReportSpliter_completeLog.txt', 'a')  # append to existing log file
             compOut.write('~~~Log Appended on ' + str(now) + ' ~~~\n')
             compOut.write('Trial Card number\n')
             compOut.close()
             log_A_N = True
         elif useLoose == 'n':
-            compOut = open(myPDFname + '_completeLog.txt', 'w')  # write a new log file
+            compOut = open('pdfReportSpliter_completeLog.txt', 'w')  # write a new log file
             compOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
             compOut.write('Trial Card number\n')
             compOut.close()
@@ -151,14 +157,14 @@ try:
         else:
             print('Invalid log command. Enter either an [A] or a [N]')
 except:
-    compOut = open(myPDFname + '_completeLog.txt', 'w')  # write a new log file
+    compOut = open('pdfReportSpliter_completeLog.txt', 'w')  # write a new log file
     compOut.write('~~~Log Created on ' + str(now) + ' ~~~\n')
     compOut.write('Trial Card number\n')
     compOut.close()
     print('New completion log created')
 
-with open(myPDFname + '_errorLog.txt', 'a') as errOut:
-    with open(myPDFname + '_completeLog.txt', 'a') as compOut:
+with open('pdfReportSpliter_errorLog.txt', 'a') as errOut:
+    with open('pdfReportSpliter_completeLog.txt', 'a') as compOut:
 
         # Begin running through the pages to extract pages for printing #
         for p in range(0, pdfPages):
