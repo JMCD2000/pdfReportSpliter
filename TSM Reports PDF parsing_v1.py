@@ -136,7 +136,7 @@ try:
     # Changing from a dynamic log(s) file naming to a static log file name
 	# in order to incorporate into a gitignore file
     # fileFound = open(myPDFname + '_completeLog.txt', 'r')  # read to see if file exist
-	fileFound = open('pdfReportSpliter_completeLog.txt', 'r')  # read to see if file exist
+    fileFound = open('pdfReportSpliter_completeLog.txt', 'r')  # read to see if file exist
     fileFound.close()
     log_A_N = False
     while log_A_N is False:
